@@ -1,15 +1,75 @@
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { CarCreateType, CarResponseType } from "../../../lib/cars/CarResponse";
 
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
-import {CarResponseType} from "../../../lib/cars/CarResponse"
 export const carApi = createApi({
-    reducerPath: "carApi",
-    baseQuery: fetchBaseQuery({baseUrl: process.env.NEXT_PUBLIC_CAR_API_URL}),
-    endpoints: (builder) => ({
+  reducerPath: "carApi",
+  baseQuery: fetchBaseQuery({
+    baseUrl: process.env.NEXT_PUBLIC_CAR_API_URL,
+  }),
+  endpoints: (builder) => ({
+    // get all cars
+    getCar: builder.query<CarResponseType[], { page: number; limit: number }>({
+      query: ({ page, limit }) => `/cars?skip=${page}&limit=${limit}`,
+    }),
 
-        getCar:builder.query<CarResponseType[],{page:number,limit:number}>({
-            query: ({ page, limit }) => `/cars?skip=${page}&limit=${limit}`,
-        })
-    })
-})
+    // get car by ID
+    getCarById: builder.query<CarResponseType, string>({
+      query: (id) => `/cars/${id}`,
+    }),
 
-export const {useGetCarQuery} = carApi;
+    // create new car
+    createCar: builder.mutation<
+      CarResponseType,
+      { newCar: CarCreateType; accessToken: string }
+    >({
+      query: ({ newCar, accessToken }) => ({
+        url: "/cars",
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: newCar,
+      }),
+    }),
+
+    // update new car
+    updateCar: builder.mutation<
+      CarResponseType,
+      { updateCar: CarCreateType; accessToken: string; id: string }
+    >({
+      query: ({ updateCar, accessToken, id }) => ({
+        url: `/cars/${id}`,
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: updateCar,
+      }),
+    }),
+
+    // delete car
+    deleteCar: builder.mutation<
+      CarResponseType,
+      { accessToken: string; id: string }
+    >({
+      query: ({ accessToken, id }) => ({
+        url: `cars/${id}`,
+        method: "DELETE",
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }),
+    }),
+  }),
+});
+
+export const {
+  useGetCarQuery,
+  useGetCarByIdQuery,
+  useCreateCarMutation,
+  useUpdateCarMutation,
+  useDeleteCarMutation,
+} = carApi;
