@@ -33,9 +33,9 @@ export async function POST(request: NextRequest) {
 
     // set cookie
     const cookieStore = cookies();
-    const cookieName = "refeshToken";
+    const cookieName = process.env.CAR_TOKEN_NAME || "refreshToken";
     const refreshToken = data.refresh_token;
-    const accessToken = data.access_token;
+  
 
     if (refreshToken) {
       // set cookieName and refreshToken into cookie
@@ -48,15 +48,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (accessToken) {
-      (await cookieStore).set({
-        name: "accessToken",
-        value: accessToken,
-        sameSite: "lax",
-        httpOnly: true,
-        secure: true,
-      });
-    }
+    
 
     return NextResponse.json(data);
   } catch (error) {

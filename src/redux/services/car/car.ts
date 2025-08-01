@@ -1,11 +1,7 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { CarCreateType, CarResponseType } from "../../../lib/cars/CarResponse";
+import { baseApi } from "@/redux/baseApi";
 
-export const carApi = createApi({
-  reducerPath: "carApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_CAR_API_URL,
-  }),
+export const carApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // get all cars
     getCar: builder.query<CarResponseType[], { page: number; limit: number }>({
